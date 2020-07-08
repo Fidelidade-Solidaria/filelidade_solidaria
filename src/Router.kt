@@ -20,7 +20,18 @@ fun Route.fidelidade() {
     val logger = LoggerFactory.getLogger("Rotas")
 
     route("/users") {
+
+        get("/") {
+            logger.info("CurrentThread: ${Thread.currentThread().name}")
+
+            val users = userService.getAll()
+
+            call.respond(HttpStatusCode.OK, users)
+        }
+
         get("/{id}") {
+            logger.info("CurrentThread: ${Thread.currentThread().name}")
+
             val id = call.parameters["id"]
 
             val idInt = id?.toInt()!!
@@ -31,6 +42,8 @@ fun Route.fidelidade() {
         }
 
         post("/{id}") {
+            logger.info("CurrentThread: ${Thread.currentThread().name}")
+
             val id = call.parameters["id"]
 
             val idInt = id?.toInt()!!
@@ -45,6 +58,8 @@ fun Route.fidelidade() {
         }
 
         delete("/{id}") {
+            logger.info("CurrentThread: ${Thread.currentThread().name}")
+
             val id = call.parameters["id"]
 
             val idInt = id?.toInt()!!

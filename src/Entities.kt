@@ -1,3 +1,5 @@
+import kotlinx.coroutines.delay
+
 data class Usuario(var id: Int, val nome: String, val email: String, val cpf: String)
 data class Parceiro(var id: Int, val nome: String, val cnpj: String)
 data class Ponto(var id: Int, val usuario: Usuario, val parceiro: Parceiro, val campanha: Campanha, val points: Int)
@@ -15,6 +17,7 @@ interface UserService {
     suspend fun createUser(user: Usuario): Usuario
     suspend fun getUser(id: Int): Usuario
     suspend fun deleteUser(user: Usuario)
+    suspend fun getAll(): Collection<Usuario>
 }
 
 interface PartnerService {
@@ -48,7 +51,7 @@ class CampaignServiceImpl : CampaignService {
 
     override fun createPoints(user: Usuario, parceiro: Parceiro, campanha: Campanha) {
         //val id: Int, val usuario: Usuario, val parceiro: Parceiro, val campanha: Campanha, val points: Int)
-        var id = getInsertId()
+        val id = getInsertId()
 
         val point = Ponto(id = id, usuario = user, parceiro = parceiro, campanha = campanha, points = campanha.points)
 
@@ -79,6 +82,7 @@ class UserServiceImpl : UserService {
     }
 
     override suspend fun getUser(id: Int): Usuario {
+        delay(10000)
         if (!users.containsKey(id)) {
             fail("User does not exists")
         }
@@ -87,6 +91,16 @@ class UserServiceImpl : UserService {
 
     override suspend fun deleteUser(user: Usuario) {
         users.remove(user.id)
+    }
+
+    override suspend fun getAll(): Collection<Usuario> {
+        val result = ArrayList<Usuario>()
+
+        if (users.size > 0) {
+            result.addAll(users.values)
+        }
+
+        return result
     }
 
 }

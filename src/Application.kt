@@ -16,8 +16,39 @@ import io.ktor.response.respondText
 import io.ktor.routing.get
 import io.ktor.routing.route
 import io.ktor.routing.routing
+import io.ktor.server.engine.applicationEngineEnvironment
+import io.ktor.server.engine.connector
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.netty.Netty
 
-fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
+//fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
+fun main(args: Array<String>): Unit {
+    val env = applicationEngineEnvironment {
+        module {
+            module(false)
+        }
+        // Public API
+        connector {
+            host = "0.0.0.0"
+            port = 8080
+        }
+    }
+
+    embeddedServer(Netty, configure = {
+        callGroupSize  = 1 //TODO: only for testing
+        // Size of the queue to store [ApplicationCall] instances that cannot be immediately processed
+        requestQueueLimit = 16
+        // Do not create separate call event group and reuse worker group for processing calls
+        shareWorkGroup = false
+        // User-provided function to configure Netty's [ServerBootstrap]
+        configureBootstrap = {
+            // ...
+        }
+        // Timeout in seconds for sending responses to client
+        responseWriteTimeoutSeconds = 10
+    }, environment = env).start(true)
+
+}
 
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
