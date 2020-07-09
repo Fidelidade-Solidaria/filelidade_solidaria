@@ -2,6 +2,7 @@ package com.fideliaz
 
 
 import CampaignServiceImpl
+import Parceiro
 import PartnerServiceImpl
 import UserServiceImpl
 import Usuario
@@ -69,6 +70,48 @@ fun Route.fidelidade() {
 
             call.respond(HttpStatusCode.OK, mapOf("$id" to "deleted"))
         }
+    }
+
+    route("/partners") {
+        get("/{id") {
+            val id = call.parameters["id"]
+
+            val idInt = id?.toInt()!!
+
+            val partner = partnerService.getPartner(idInt)
+
+            call.respond(HttpStatusCode.OK, partner)
+        }
+
+        post("/{id}") {
+            logger.info("CurrentThread: ${Thread.currentThread().name}")
+
+            val id = call.parameters["id"]
+
+            val idInt = id?.toInt()!!
+
+            val partner = call.receive<Parceiro>()
+
+            partner.id = idInt
+
+            val createdPartner = partnerService.createPartner(partner)
+
+            call.respond(HttpStatusCode.Created, createdPartner)
+        }
+
+        delete("/{id}") {
+            logger.info("CurrentThread: ${Thread.currentThread().name}")
+
+            val id = call.parameters["id"]
+
+            val idInt = id?.toInt()!!
+
+            partnerService.deletePartner(idInt)
+
+            call.respond(HttpStatusCode.OK, mapOf("$id" to "deleted"))
+        }
+
+
     }
 
 }

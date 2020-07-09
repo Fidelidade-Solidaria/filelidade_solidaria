@@ -1,5 +1,3 @@
-import kotlinx.coroutines.delay
-
 data class Usuario(var id: Int, val nome: String, val email: String, val cpf: String)
 data class Parceiro(var id: Int, val nome: String, val cnpj: String)
 data class Ponto(var id: Int, val usuario: Usuario, val parceiro: Parceiro, val campanha: Campanha, val points: Int)
@@ -21,9 +19,9 @@ interface UserService {
 }
 
 interface PartnerService {
-    fun createPartner(parceiro: Parceiro)
-    fun getPartner(id: Int): Parceiro
-    fun deletePartner(parceiro: Parceiro)
+    suspend fun createPartner(parceiro: Parceiro): Parceiro
+    suspend fun getPartner(id: Int): Parceiro
+    suspend fun deletePartner(id: Int)
 }
 
 fun fail(message: String): Nothing {
@@ -82,7 +80,6 @@ class UserServiceImpl : UserService {
     }
 
     override suspend fun getUser(id: Int): Usuario {
-        delay(10000)
         if (!users.containsKey(id)) {
             fail("User does not exists")
         }
@@ -109,11 +106,12 @@ class PartnerServiceImpl : PartnerService {
 
     val partners = HashMap<Int, Parceiro>()
 
-    override fun createPartner(parceiro: Parceiro) {
+    override suspend fun createPartner(parceiro: Parceiro): Parceiro {
         partners[parceiro.id] = parceiro
+        return parceiro
     }
 
-    override fun getPartner(id: Int): Parceiro {
+    override suspend fun getPartner(id: Int): Parceiro {
         if (!partners.containsKey(id)) {
             fail("Partners does not exist")
         }
@@ -121,8 +119,8 @@ class PartnerServiceImpl : PartnerService {
         return partners[id]!!
     }
 
-    override fun deletePartner(parceiro: Parceiro) {
-        partners.remove(parceiro.id)
+    override suspend fun deletePartner(id: Int) {
+        partners.remove(id)
     }
 
 }
